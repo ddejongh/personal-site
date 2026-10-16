@@ -1,17 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
+import PersonSchema from '../components/PersonSchema.astro';
+import { getProfile } from '../lib/profile';
 
-// TODO: fill in real details (milestone 2 moves these into content collections).
-const name = 'Your Name';
-const bio = 'Full-stack developer. This site is a small 3D world you can explore.';
+const profile = await getProfile();
 ---
 
-<Base title={name} description={bio}>
+<Base title={profile.name} description={profile.bio}>
+	<PersonSchema slot="head" />
+
 	<a class="skip" href="/resume">Skip to plain version</a>
 
-	<main>
-		<h1>{name}</h1>
-		<p>{bio}</p>
+	<main class="container">
+		<h1>{profile.name}</h1>
+		<p>{profile.bio}</p>
 		<nav aria-label="Plain site">
 			<ul>
 				<li><a href="/resume">Résumé</a></li>
@@ -37,15 +39,7 @@ const bio = 'Full-stack developer. This site is a small 3D world you can explore
 		border-radius: 0.25rem;
 	}
 
-	.skip:focus-visible {
-		outline: 3px solid #4af;
-		outline-offset: 2px;
-	}
-
 	main {
-		max-width: 40rem;
-		margin: 5rem auto;
-		padding: 0 1rem;
-		font-family: system-ui, sans-serif;
+		margin-top: 5rem;
 	}
 </style>

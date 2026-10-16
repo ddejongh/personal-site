@@ -1,0 +1,16 @@
+[
+	{
+		"id": "me",
+		"name": "Your Name",
+		"headline": "Full-stack developer",
+		"bio": "Full-stack developer. This site is a small 3D world you can explore.",
+		"location": "City, Country",
+		"links": [
+			{ "label": "GitHub", "url": "https://github.com/ddejongh" }
+		],
+		"skills": [
+			{ "group": "Languages", "items": ["TypeScript", "Python", "Go", "C/C++"] },
+			{ "group": "Learning", "items": ["Three.js", "Game development"] }
+		]
+	}
+]

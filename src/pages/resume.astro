@@ -1,0 +1,85 @@
+---
+import { getCollection, render } from 'astro:content';
+import Plain from '../layouts/Plain.astro';
+import PersonSchema from '../components/PersonSchema.astro';
+import { formatRange, getProfile } from '../lib/profile';
+
+const profile = await getProfile();
+const jobs = (await getCollection('experience')).sort(
+	(a, b) => b.data.start.valueOf() - a.data.start.valueOf(),
+);
+const rendered = await Promise.all(jobs.map(async (job) => ({ job, Content: (await render(job)).Content })));
+---
+
+<Plain title="Résumé" description={`Résumé of ${profile.name}, ${profile.headline}.`}>
+	<PersonSchema slot="head" />
+
+	<h1>{profile.name}</h1>
+	<p class="muted">
+		{profile.headline}{profile.location && ` · ${profile.location}`}
+	</p>
+	<p class="links">
+		{profile.email && <a href={`mailto:${profile.email}`}>{profile.email}</a>}
+		{profile.links.map((link) => <a href={link.url}>{link.label}</a>)}
+	</p>
+
+	<h2>Experience</h2>
+	{
+		rendered.map(({ job, Content }) => (
+			<article>
+				<h3>
+					{job.data.role}, {job.data.company}
+				</h3>
+				<p class="muted">
+					{formatRange(job.data.start, job.data.end)}
+					{job.data.location && ` · ${job.data.location}`}
+				</p>
+				<Content />
+			</article>
+		))
+	}
+
+	<h2>Skills</h2>
+	<dl>
+		{
+			profile.skills.map((skill) => (
+				<>
+					<dt>{skill.group}</dt>
+					<dd>{skill.items.join(', ')}</dd>
+				</>
+			))
+		}
+	</dl>
+</Plain>
+
+<style>
+	h1 {
+		margin-bottom: 0;
+	}
+
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+
+	article {
+		margin-bottom: 1.5rem;
+	}
+
+	article h3 {
+		margin-bottom: 0;
+	}
+
+	article p.muted {
+		margin-top: 0.25rem;
+	}
+
+	dt {
+		font-weight: 600;
+	}
+
+	dd {
+		margin: 0 0 0.75rem;
+	}
+</style>

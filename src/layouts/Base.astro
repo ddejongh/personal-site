@@ -1,4 +1,6 @@
 ---
+import '../styles/global.css';
+
 interface Props {
 	title: string;
 	description: string;
@@ -24,6 +26,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonical} />
+		<slot name="head" />
 	</head>
 	<body>
 		<slot />

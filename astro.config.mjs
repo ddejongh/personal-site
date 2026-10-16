@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  // TODO: replace with the real domain once it's settled.
-  site: 'https://example.com',
+  // Switch to the custom domain once it's set up.
+  site: 'https://personal-site.devindejongh.workers.dev',
   integrations: [sitemap()]
 });

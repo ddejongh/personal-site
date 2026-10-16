@@ -1,0 +1,77 @@
+---
+import Base from './Base.astro';
+import { getProfile } from '../lib/profile';
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+const profile = await getProfile();
+const path = Astro.url.pathname.replace(/\/$/, '');
+const nav = [
+	{ href: '/resume', label: 'Résumé' },
+	{ href: '/about', label: 'About' },
+	{ href: '/projects', label: 'Projects' },
+];
+---
+
+<Base title={`${title} · ${profile.name}`} description={description}>
+	<slot name="head" slot="head" />
+	<header class="container">
+		<a class="home" href="/">{profile.name}</a>
+		<nav aria-label="Main">
+			{
+				nav.map((item) => (
+					<a href={item.href} aria-current={path.startsWith(item.href) ? 'page' : undefined}>
+						{item.label}
+					</a>
+				))
+			}
+		</nav>
+	</header>
+	<main class="container">
+		<slot />
+	</main>
+</Base>
+
+<style>
+	header {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+		align-items: baseline;
+		justify-content: space-between;
+		padding-top: 1.5rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.home {
+		font-weight: 600;
+		color: var(--fg);
+		text-decoration: none;
+	}
+
+	nav {
+		display: flex;
+		gap: 1rem;
+	}
+
+	nav a {
+		color: var(--muted);
+		text-decoration: none;
+	}
+
+	nav a:hover,
+	nav a[aria-current='page'] {
+		color: var(--fg);
+		text-decoration: underline;
+	}
+
+	main {
+		padding-top: 2rem;
+		padding-bottom: 4rem;
+	}
+</style>

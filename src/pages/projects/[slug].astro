@@ -1,0 +1,35 @@
+---
+import { render } from 'astro:content';
+import Plain from '../../layouts/Plain.astro';
+import { getProjects } from '../../lib/projects';
+
+export async function getStaticPaths() {
+	const projects = await getProjects();
+	return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<Plain title={project.data.title} description={project.data.summary}>
+	<p><a href="/projects">← All projects</a></p>
+	<h1>{project.data.title}</h1>
+	<p class="muted">{project.data.tags.join(' · ')}</p>
+	<p class="links">
+		{project.data.url && <a href={project.data.url}>Live site</a>}
+		{project.data.repo && <a href={project.data.repo}>Source</a>}
+	</p>
+	<Content />
+</Plain>
+
+<style>
+	h1 {
+		margin-bottom: 0;
+	}
+
+	.links {
+		display: flex;
+		gap: 1rem;
+	}
+</style>
