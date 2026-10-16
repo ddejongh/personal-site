@@ -7,10 +7,21 @@ const profile = defineCollection({
 	schema: z.object({
 		name: z.string(),
 		headline: z.string(),
+		// Short one-liner for the home page and meta tags.
 		bio: z.string(),
+		// Longer paragraph for the top of the résumé.
+		summary: z.string(),
 		location: z.string().optional(),
 		email: z.email().optional(),
 		links: z.array(z.object({ label: z.string(), url: z.url() })),
+		education: z.array(
+			z.object({
+				school: z.string(),
+				degree: z.string(),
+				end: z.coerce.date(),
+				notes: z.array(z.string()).default([]),
+			}),
+		),
 		skills: z.array(z.object({ group: z.string(), items: z.array(z.string()) })),
 	}),
 });

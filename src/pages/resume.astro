@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Plain from '../layouts/Plain.astro';
 import PersonSchema from '../components/PersonSchema.astro';
-import { formatRange, getProfile } from '../lib/profile';
+import { formatMonthYear, formatRange, getProfile } from '../lib/profile';
 
 const profile = await getProfile();
 const jobs = (await getCollection('experience')).sort(
@@ -23,6 +23,8 @@ const rendered = await Promise.all(jobs.map(async (job) => ({ job, Content: (awa
 		{profile.links.map((link) => <a href={link.url}>{link.label}</a>)}
 	</p>
 
+	<p>{profile.summary}</p>
+
 	<h2>Experience</h2>
 	{
 		rendered.map(({ job, Content }) => (
@@ -35,6 +37,25 @@ const rendered = await Promise.all(jobs.map(async (job) => ({ job, Content: (awa
 					{job.data.location && ` · ${job.data.location}`}
 				</p>
 				<Content />
+			</article>
+		))
+	}
+
+	<h2>Education</h2>
+	{
+		profile.education.map((school) => (
+			<article>
+				<h3>
+					{school.degree}, {school.school}
+				</h3>
+				<p class="muted">{formatMonthYear(school.end)}</p>
+				{school.notes.length > 0 && (
+					<ul>
+						{school.notes.map((note) => (
+							<li>{note}</li>
+						))}
+					</ul>
+				)}
 			</article>
 		))
 	}

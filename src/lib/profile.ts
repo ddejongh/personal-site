@@ -8,6 +8,10 @@ export async function getProfile() {
 
 const monthYear = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 
+export function formatMonthYear(date: Date) {
+	return monthYear.format(date);
+}
+
 export function formatRange(start: Date, end?: Date) {
-	return `${monthYear.format(start)} – ${end ? monthYear.format(end) : 'Present'}`;
+	return `${formatMonthYear(start)} – ${end ? formatMonthYear(end) : 'Present'}`;
 }

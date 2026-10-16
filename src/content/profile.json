@@ -1,16 +1,39 @@
 [
 	{
 		"id": "me",
-		"name": "Your Name",
-		"headline": "Full-stack developer",
-		"bio": "Full-stack developer. This site is a small 3D world you can explore.",
-		"location": "City, Country",
+		"name": "Devin DeJongh",
+		"headline": "Software Engineer",
+		"bio": "Software engineer building backend services in Go, Python and TypeScript. This site is a small 3D world you can explore.",
+		"summary": "Mid-level Software Engineer with experience building and maintaining scalable backend services in Go, Python, and TypeScript, supported by strong object-oriented and procedural programming skills. Delivers reliable APIs, cloud-native services, testing, observability, and defect resolution using gRPC, REST, Kubernetes, Docker, and Git. Reduced annual infrastructure costs while optimizing a global video ingestion platform.",
+		"location": "Princeton, TX",
+		"email": "devindejongh@proton.me",
 		"links": [
 			{ "label": "GitHub", "url": "https://github.com/ddejongh" }
 		],
+		"education": [
+			{
+				"school": "The University of Texas at Dallas",
+				"degree": "BS, Computer Science",
+				"end": "2022-06-01",
+				"notes": [
+					"Academic Excellence Scholarship Recipient",
+					"Society of Asian Scientists and Engineers, Webmaster Chair"
+				]
+			}
+		],
 		"skills": [
-			{ "group": "Languages", "items": ["TypeScript", "Python", "Go", "C/C++"] },
-			{ "group": "Learning", "items": ["Three.js", "Game development"] }
+			{
+				"group": "Languages",
+				"items": ["Go", "Python", "TypeScript", "JavaScript", "C#", "SQL", "Object-Oriented and Procedural Programming"]
+			},
+			{
+				"group": "Frameworks/Tools",
+				"items": ["React", "Node.js", "Flask", "Spring", "gRPC", "Git", "Software Testing and Debugging", "Jira"]
+			},
+			{
+				"group": "Cloud/DevOps",
+				"items": ["Azure", "Kubernetes", "Docker", "Helm", "GitLab", "Git", "OpenTelemetry"]
+			}
 		]
 	}
 ]
