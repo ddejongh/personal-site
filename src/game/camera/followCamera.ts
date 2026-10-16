@@ -13,22 +13,33 @@ export const cameraSettings = {
 const MIN_PITCH = 0.05;
 const MAX_PITCH = 1.3;
 const LOOK_HEIGHT = 1.4;
+/** How far the camera stays in front of whatever blocks it. */
+const CLIP_MARGIN = 0.3;
+
+/** Returns the free distance along a unit `direction` from `origin`, up to `maxDistance`. */
+export type ClipTest = (origin: THREE.Vector3, direction: THREE.Vector3, maxDistance: number) => number;
 
 /**
  * Third-person orbit camera. Drag to rotate, scroll to zoom.
  *
- * `yaw` is read by the player so WASD stays relative to the view.
- * Camera collision comes later, once there's physics to raycast against.
+ * `yaw` is read by the player so WASD stays relative to the view. A ray from
+ * the player's head toward the camera pulls it in when a wall is in the way:
+ * instantly when blocked, easing back out once clear.
  */
 export class FollowCamera {
 	readonly camera: THREE.PerspectiveCamera;
 	yaw = 0;
 	private pitch = 0.35;
 	private readonly focus = new THREE.Vector3();
-	private readonly offset = new THREE.Vector3();
+	private readonly pivot = new THREE.Vector3();
+	private readonly direction = new THREE.Vector3();
+	private currentDistance = cameraSettings.distance;
 	private dragging = false;
 
-	constructor(private readonly element: HTMLElement) {
+	constructor(
+		private readonly element: HTMLElement,
+		private readonly clip?: ClipTest,
+	) {
 		this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 200);
 		element.addEventListener('pointerdown', this.onPointerDown);
 		element.addEventListener('pointermove', this.onPointerMove);
@@ -40,21 +51,28 @@ export class FollowCamera {
 	/** Snap to the target without easing (on spawn). */
 	snapTo(target: THREE.Vector3) {
 		this.focus.copy(target);
+		this.currentDistance = cameraSettings.distance;
 		this.update(target, 0);
 	}
 
 	update(target: THREE.Vector3, frameDt: number) {
 		this.focus.lerp(target, 1 - Math.exp(-cameraSettings.followRate * frameDt));
+		this.pivot.set(this.focus.x, this.focus.y + LOOK_HEIGHT, this.focus.z);
 
-		const horizontal = Math.cos(this.pitch) * cameraSettings.distance;
-		this.offset.set(
-			Math.sin(this.yaw) * horizontal,
-			Math.sin(this.pitch) * cameraSettings.distance + LOOK_HEIGHT,
-			Math.cos(this.yaw) * horizontal,
-		);
+		// Unit vector from the pivot out toward the camera.
+		const horizontal = Math.cos(this.pitch);
+		this.direction.set(Math.sin(this.yaw) * horizontal, Math.sin(this.pitch), Math.cos(this.yaw) * horizontal);
 
-		this.camera.position.copy(this.focus).add(this.offset);
-		this.camera.lookAt(this.focus.x, this.focus.y + LOOK_HEIGHT, this.focus.z);
+		const wanted = cameraSettings.distance;
+		const free = this.clip ? this.clip(this.pivot, this.direction, wanted + CLIP_MARGIN) - CLIP_MARGIN : wanted;
+		const allowed = THREE.MathUtils.clamp(free, 0.5, wanted);
+		this.currentDistance =
+			allowed < this.currentDistance
+				? allowed
+				: THREE.MathUtils.lerp(this.currentDistance, allowed, 1 - Math.exp(-4 * frameDt));
+
+		this.camera.position.copy(this.pivot).addScaledVector(this.direction, this.currentDistance);
+		this.camera.lookAt(this.pivot);
 	}
 
 	setAspect(aspect: number) {

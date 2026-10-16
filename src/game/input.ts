@@ -5,6 +5,8 @@
  */
 export class Input {
 	private readonly down = new Set<string>();
+	/** When each key was last pressed, for one-shot actions like jumping. */
+	private readonly pressedAt = new Map<string, number>();
 
 	constructor(private readonly target: Window = window) {
 		target.addEventListener('keydown', this.onKeyDown);
@@ -22,6 +24,18 @@ export class Input {
 		return Number(this.isDown(positive)) - Number(this.isDown(negative));
 	}
 
+	/**
+	 * True once if `code` was pressed within the last `withinMs`, then forgets
+	 * the press. The window is an input buffer: pressing jump slightly before
+	 * landing still jumps.
+	 */
+	consumePress(code: string, withinMs: number): boolean {
+		const at = this.pressedAt.get(code);
+		if (at === undefined || performance.now() - at > withinMs) return false;
+		this.pressedAt.delete(code);
+		return true;
+	}
+
 	dispose() {
 		this.target.removeEventListener('keydown', this.onKeyDown);
 		this.target.removeEventListener('keyup', this.onKeyUp);
@@ -30,7 +44,10 @@ export class Input {
 
 	private onKeyDown = (event: KeyboardEvent) => {
 		if (event.metaKey || event.ctrlKey || event.altKey) return;
+		// Space would otherwise scroll the page, but leave it alone when a link or control has focus.
+		if (event.code === 'Space' && event.target === document.body) event.preventDefault();
 		this.down.add(event.code);
+		if (!event.repeat) this.pressedAt.set(event.code, performance.now());
 	};
 
 	private onKeyUp = (event: KeyboardEvent) => {
@@ -39,5 +56,6 @@ export class Input {
 
 	private onBlur = () => {
 		this.down.clear();
+		this.pressedAt.clear();
 	};
 }
