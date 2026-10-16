@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+
+// TODO: fill in real details (milestone 2 moves these into content collections).
+const name = 'Your Name';
+const bio = 'Full-stack developer. This site is a small 3D world you can explore.';
+---
+
+<Base title={name} description={bio}>
+	<a class="skip" href="/resume">Skip to plain version</a>
+
+	<main>
+		<h1>{name}</h1>
+		<p>{bio}</p>
+		<nav aria-label="Plain site">
+			<ul>
+				<li><a href="/resume">Résumé</a></li>
+				<li><a href="/about">About</a></li>
+				<li><a href="/projects">Projects</a></li>
+			</ul>
+		</nav>
+	</main>
+
+	<!-- The game mounts here in milestone 3. -->
+	<canvas id="game" aria-hidden="true"></canvas>
+</Base>
+
+<style>
+	.skip {
+		position: fixed;
+		top: 1rem;
+		left: 1rem;
+		z-index: 10;
+		padding: 0.5rem 0.75rem;
+		background: #111;
+		color: #fff;
+		border-radius: 0.25rem;
+	}
+
+	.skip:focus-visible {
+		outline: 3px solid #4af;
+		outline-offset: 2px;
+	}
+
+	main {
+		max-width: 40rem;
+		margin: 5rem auto;
+		padding: 0 1rem;
+		font-family: system-ui, sans-serif;
+	}
+</style>
