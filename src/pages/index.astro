@@ -11,7 +11,9 @@ const profile = await getProfile();
 
 	<a class="skip" href="/resume">Skip to plain version</a>
 
-	<main class="container">
+	<!-- Real HTML for crawlers and for visitors who can't run the game. When the
+	     game starts, this becomes a small card on top of the canvas. -->
+	<main class="container intro">
 		<h1>{profile.name}</h1>
 		<p>{profile.bio}</p>
 		<nav aria-label="Plain site">
@@ -21,11 +23,33 @@ const profile = await getProfile();
 				<li><a href="/projects">Projects</a></li>
 			</ul>
 		</nav>
+		<p class="controls muted">
+			<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move · <kbd>Shift</kbd> run · drag to look · scroll
+			to zoom
+		</p>
 	</main>
 
-	<!-- The game mounts here in milestone 3. -->
 	<canvas id="game" aria-hidden="true"></canvas>
 </Base>
+
+<script>
+	import { canRunGame } from '../game/support';
+
+	const canvas = document.querySelector<HTMLCanvasElement>('#game');
+
+	if (canvas && canRunGame()) {
+		// Dynamic import: Three.js is only downloaded when the game can actually run.
+		const { startGame } = await import('../game/main');
+		const stop = await startGame(canvas);
+		document.documentElement.classList.add('game');
+
+		// Tear down cleanly when Vite hot-reloads this module in dev.
+		import.meta.hot?.dispose(() => {
+			stop();
+			document.documentElement.classList.remove('game');
+		});
+	}
+</script>
 
 <style>
 	.skip {
@@ -39,7 +63,78 @@ const profile = await getProfile();
 		border-radius: 0.25rem;
 	}
 
-	main {
+	.intro {
 		margin-top: 5rem;
+	}
+
+	.controls {
+		display: none;
+	}
+
+	kbd {
+		display: inline-block;
+		min-width: 1.5em;
+		margin-right: 0.15em;
+		padding: 0 0.3em;
+		border: 1px solid var(--border);
+		border-radius: 0.25rem;
+		font-family: inherit;
+		font-size: 0.85em;
+		text-align: center;
+	}
+
+	canvas {
+		display: none;
+	}
+
+	/* Game running: full-screen canvas with the intro as an overlay card. */
+	:global(html.game) {
+		overflow: hidden;
+	}
+
+	:global(html.game) canvas {
+		display: block;
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100vh;
+		touch-action: none;
+		cursor: grab;
+	}
+
+	:global(html.game) canvas:active {
+		cursor: grabbing;
+	}
+
+	:global(html.game) .intro {
+		position: fixed;
+		top: 1rem;
+		right: 1rem;
+		z-index: 5;
+		width: 20rem;
+		margin: 0;
+		padding: 1rem 1.25rem;
+		background: color-mix(in srgb, var(--bg) 88%, transparent);
+		border: 1px solid var(--border);
+		border-radius: 0.5rem;
+		backdrop-filter: blur(6px);
+	}
+
+	:global(html.game) .intro h1 {
+		margin: 0;
+		font-size: 1.4rem;
+	}
+
+	:global(html.game) .intro ul {
+		display: flex;
+		gap: 1rem;
+		padding: 0;
+		list-style: none;
+	}
+
+	:global(html.game) .controls {
+		display: block;
+		margin-bottom: 0;
+		font-size: 0.85rem;
 	}
 </style>
